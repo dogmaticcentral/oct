@@ -4,6 +4,7 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
+from oct_utils.conventions import controls_alias_hack
 
 POSTERIOR_POLE_TABLE_NAME = "posterior_pole_data"
 
@@ -19,6 +20,8 @@ class PosteriorPoleData:
     choroid_ok: bool = True
     filename: str | None = None
     filename_md5: str | None = None
+    avg_thickness: float | None = None
+    wtd_avg_thickness: float | None = None
 
     def __init__(self, alias="", laterality="", age_at_test=-1):
         self.alias = alias
@@ -81,6 +84,26 @@ class PosteriorPoleData:
         oct_df.loc[len(oct_df)] = new_row  # Append row in place using loc
 
 
+    def pd_df_store_minimal(self, oct_df: pd.DataFrame):
+        """
+        Appends the current instance's data to an existing pandas dataframe.
+        """
+        update_fields = {'alias': self.alias,
+                         'eye': self.laterality,
+                         'age_acquired': self.age_at_test,
+                         'file_name': self.filename,
+                         'file_md5': self.filename_md5,
+                         'avg_thickness': self.avg_thickness,
+                         'wtd_avg_thickness': self.wtd_avg_thickness
+                         }
+
+        if not set(update_fields.keys()).issubset(set(oct_df.columns)):
+            raise ValueError("Dictionary keys do not match dataframe columns")
+
+        new_row = {col: update_fields.get(col, None) for col in oct_df.columns}
+
+        oct_df.loc[len(oct_df)] = new_row  # Append row in place using loc
+
     def pd_dataframe_read(self, oct_df: pd.DataFrame, index: int, fussy: bool = True, xml_dir_path: str | None = None):
         """
         Reads data from a pandas dataframe row and populates the current instance's attributes.
@@ -92,6 +115,7 @@ class PosteriorPoleData:
 
         # Populate basic attributes
         self.alias = row['alias']
+        if "control" in self.alias.lower(): controls_alias_hack(self)
         self.laterality = row['eye']
         self.age_at_test = row['age_acquired']
         self.filename = row['file_name']

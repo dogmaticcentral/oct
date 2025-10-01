@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from abca4_87_oct.oct_utils.data_structures import PosteriorPoleData
+from oct_utils.data_structures import PosteriorPoleData
 
 
 def weighted_avg(ppd: PosteriorPoleData, interp=False, weight_type="") -> float:
@@ -46,24 +46,14 @@ def weighted_avg(ppd: PosteriorPoleData, interp=False, weight_type="") -> float:
         ])
     elif weight_type == "physiological":
         weights = pd.DataFrame([
-            # [3, 19, 30, 35, 35, 30, 19, 3],
-            # [14, 48, 46, 49, 49, 46, 28, 8],
-            # [25, 37, 22, 32, 32, 82, 31, 15],
-            # [30, 29, 27, 77, 84, 45, 34, 20],
-            # [30, 29, 27, 61, 97, 45, 34, 20],
-            # [25, 37, 2, 44, 44, 100, 31, 15],
-            # [15, 80, 77, 71, 71, 77, 67, 12],
-            # [9, 41, 59, 66, 66, 59, 41, 9]
-
-             [15, 19, 20, 19, 19, 20, 19, 7],
-             [18, 19, 17, 11, 11, 17, 11, 2],
-             [11, 3, 6, 22, 22, 9, 2, 3],
-             [9, 5, 33, 95, 92, 39, 6, 3],
-             [10, 5, 33, 100, 68, 39, 6, 3],
-             [11, 3, 11, 18, 18, 3, 2, 9],
-             [13, 10, 24, 21, 21, 30, 23, 26],
-             [13, 14, 33, 33, 33, 33, 30, 19]
-
+            [3, 19, 30, 35, 35, 30, 19, 3],
+            [14, 48, 46, 49, 49, 46, 28, 8],
+            [25, 37, 22, 32, 32, 82, 31, 15],
+            [30, 29, 27, 77, 84, 45, 34, 20],
+            [30, 29, 27, 61, 97, 45, 34, 20],
+            [25, 37, 2, 44, 44, 100, 31, 15],
+            [15, 80, 77, 71, 71, 77, 67, 12],
+            [9, 41, 59, 66, 66, 59, 41, 9]
         ])
     else:
         raise Exception(f"Unrecognized wighting scheme: {weight_type}")

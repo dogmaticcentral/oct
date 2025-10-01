@@ -56,11 +56,10 @@ def xml_files_to_interpolated_ppds(homedir: str,  chorthck_df: pd.DataFrame | No
 
     return interpolated_ppds
 
-def main():
-    top_level_dir  = f"/media/ivana/portable/ush2a/oct/xml"
-    patient_homedir = f"{top_level_dir}/all"
 
-    interp_vals = xml_files_to_interpolated_ppds(patient_homedir, None)
+def interpolate_dir_to_df(data_dir) -> pd.DataFrame:
+
+    interp_vals = xml_files_to_interpolated_ppds(data_dir, None)
     clean_interp_values(interp_vals)
 
     output_df = pd.DataFrame(columns=['alias', 'eye', 'age_acquired', 'file_name', 'file_md5', 'total_volume',
@@ -69,10 +68,19 @@ def main():
         for eye, ppds in eye_dict.items():
             for ppd in ppds:
                 ppd: PosteriorPoleData
-                dir_path = f"{patient_homedir}/{alias}/{eye}"
+                dir_path = f"{data_dir}/{alias}/{eye}"
                 ppd.pd_dataframe_store(output_df, fussy= True, xml_dir_path=dir_path)
+    return output_df
 
-    output_df.to_excel("interpolated_maps.xlsx")
+
+def main():
+    top_level_dir  = f"/media/ivana/portable/ush2a/oct/xml"
+    scratch_dir = "/home/ivana/scratch/ush2a_oct"
+
+    for data_group in ["patients", "controls"]:
+        data_dir = f"{top_level_dir}/{data_group}"
+        output_df = interpolate_dir_to_df(data_dir)
+        output_df.to_excel(f"{scratch_dir}/interpolated_maps.{data_group}.xlsx")
 
 
 

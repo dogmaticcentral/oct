@@ -18,7 +18,7 @@ def main():
         ppd.pd_dataframe_read(oct_df, index_value, fussy=True, xml_dir_path=patient_homedir)
         plot_thickness_map(ppd, orig_dir, thck_map="original")
         plot_thickness_map(ppd, intrp_dir, thck_map="interp")
- 
+
 #######################
 if __name__ == "__main__":
     main()

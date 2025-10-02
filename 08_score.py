@@ -9,23 +9,40 @@ from oct_utils.stats import weighted_avg
 def plot(df_dict, x_column: str, y_column_1: str, y_column_2: str, outfnm: str) :
     fig, axes = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(10, 5))
 
-    # Scatter plot y_column_1 vs x_column in first panel
+     # Scatter plot y_column_1 vs x_column in first panel
+    #  Scatter plot y_column_2 vs x_column in second panel
+    # controls first
     axes[0].scatter(df_dict["controls"][x_column], df_dict["controls"][y_column_1], label="controls")
-    axes[0].scatter(df_dict["patients"][x_column], df_dict["patients"][y_column_1], color="red", label="patients")
+    axes[1].scatter(df_dict["controls"][x_column], df_dict["controls"][y_column_2], label="controls")
+
+    # linespoints for patients
+    axes[0].scatter(df_dict["patients"][x_column], df_dict["patients"][y_column_1])
+    axes[1].scatter(df_dict["patients"][x_column], df_dict["patients"][y_column_2])
+
+    # connect points from the same patient with lines
+    df = df_dict["patients"]
+    colors = ["yellowgreen", "orange", "red", "cyan", "gold", "purple", "teal"]
+
+    for idx, alias in enumerate (df["alias"].unique()):
+        alias_df = df[df["alias"] == alias].sort_values(by=x_column, ascending=True)
+
+        axes[0].plot(alias_df[x_column], alias_df[y_column_1], color=colors[idx])
+        axes[0].scatter(alias_df[x_column], alias_df[y_column_1], color=colors[idx], label=alias)
+        axes[1].plot(alias_df[x_column], alias_df[y_column_2], color=colors[idx])
+        axes[1].scatter(alias_df[x_column], alias_df[y_column_2], color=colors[idx])
+
     axes[0].set_xlabel(x_column)
     axes[0].set_ylabel(y_column_1)
-    axes[0].set_ylim([210, 350])
-    axes[0].legend()
+    axes[0].set_ylim([200, 350])
+    axes[0].legend(loc="lower left")
 
-    # Scatter plot y_column_2 vs x_column in second panel
-    axes[1].scatter(df_dict["controls"][x_column], df_dict["controls"][y_column_2], label="controls")
-    axes[1].scatter(df_dict["patients"][x_column], df_dict["patients"][y_column_2], color="red", label="patients")
     axes[1].set_xlabel(x_column)
     axes[1].set_ylabel(y_column_2)
-    axes[1].legend()
+    # axes[1].legend()
 
-    plt.savefig(outfnm)
-    print(f"plot written to {outfnm}")
+    # plt.savefig(outfnm)
+    # print(f"plot written to {outfnm}")
+    plt.show()
 
 def main():
     top_level_dir = f"/media/ivana/portable/ush2a/oct/xml"

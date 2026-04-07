@@ -74,8 +74,8 @@ def interpolate_dir_to_df(data_dir) -> pd.DataFrame:
 
 
 def main():
-    top_level_dir  = f"/media/ivana/portable/ush2a/oct/xml"
-    scratch_dir = "/home/ivana/scratch/ush2a_oct"
+    top_level_dir  = f"/media/ivana/portable/abca4/oct/xml"
+    scratch_dir = "/home/ivana/scratch/abca4_oct/xlsx"
 
     for data_group in ["patients", "controls"]:
         data_dir = f"{top_level_dir}/{data_group}"

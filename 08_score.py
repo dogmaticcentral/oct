@@ -81,7 +81,7 @@ def plot(df_dict, x_column: str, y_column_1: str, y_column_2: str, scratchdir: s
         # Set labels and limits
         axes[0].set_xlabel(x_column)
         axes[0].set_ylabel(y_column_1)
-        axes[0].set_ylim([200, 350])
+        axes[0].set_ylim([180, 350])
         axes[0].legend(loc="lower left")
 
         axes[1].set_xlabel(x_column)

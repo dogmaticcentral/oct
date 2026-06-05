@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def plot_results(grid_values, extent, cell_size_mm, output_file='', label='Measurement Value'):
+def plot_results(grid_values, extent, cell_size_mm, output_file='', colorbar_label='Measurement Value', title=None):
     """
     Plot the interpolated grid.
 
@@ -22,7 +22,7 @@ def plot_results(grid_values, extent, cell_size_mm, output_file='', label='Measu
     # Plot heatmap
     im = plt.imshow(grid_values, extent=extent, origin='lower',
                     cmap='viridis', aspect='equal')
-    plt.colorbar(im, label=label)
+    plt.colorbar(im, label=colorbar_label)
 
     # Add grid lines
     grid_ticks = np.arange(extent[0], extent[1] + cell_size_mm, cell_size_mm)
@@ -33,7 +33,9 @@ def plot_results(grid_values, extent, cell_size_mm, output_file='', label='Measu
     # Labels
     plt.xlabel('X (mm)')
     plt.ylabel('Y (mm)')
-    plt.title(f'8x8 Grid Interpolation ({cell_size_mm:.2f} × {cell_size_mm:.2f} mm cells)')
+    if title is None:
+        title = f'8x8 Grid Interpolation ({cell_size_mm:.2f} × {cell_size_mm:.2f} mm cells)'
+    plt.title(title)
 
     # Add radial reference circles at 1mm intervals
     max_radius = np.sqrt(2) * extent[1]  # Maximum visible radius
@@ -43,7 +45,7 @@ def plot_results(grid_values, extent, cell_size_mm, output_file='', label='Measu
         plt.gca().add_patch(circle)
         # Add radius label
         plt.text(0, radius_mm, f'{radius_mm:.0f}mm',
-                 ha='center', va='bottom', fontsize=8, alpha=0.7)
+                 ha='center', va='bottom', fontsize=8, alpha=0.7, color="white")
 
     if output_file:
         plt.savefig(output_file, dpi=300, bbox_inches='tight')

@@ -59,7 +59,7 @@ def main():
             ppd = PosteriorPoleData()
             ppd.pd_dataframe_read(oct_df, index_value, fussy=True, xml_dir_path=data_dir)
             ppd.avg_thickness = round(weighted_avg(ppd, interp=True, weight_type="8x8")*1000)
-            ppd.wtd_avg_thickness = round(weighted_avg(ppd, interp=True, weight_type="physiological")*1000)
+            ppd.wtd_avg_thickness = round(weighted_avg(ppd, interp=True, weight_type="inverted")*1000)
             ppd.pd_df_store_minimal(output_df[data_group])
         output_df[data_group].to_excel(f"{scratch_dir}/avg_retinal_thickness.{data_group}.xlsx")
 

@@ -245,7 +245,7 @@ def interpolate(shet_name: str, cell_size_mm, cells_per_side, plot=False):
     # Plot results
     if plot:
         print("Plotting results...")
-        plot_results(grid_values, extent, cell_size_mm, f"figures/{base_name}_grid.png", label=shet_name)
+        plot_results(grid_values, extent, cell_size_mm, f"figures/{base_name}_grid.png", colorbar_label=shet_name)
 
     output_df = pd.DataFrame(grid_values)
     # Save interpolated values to CSV

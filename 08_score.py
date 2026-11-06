@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from oct_utils.data_structures import PosteriorPoleData
 from oct_utils.stats import weighted_avg
 
-def plot(df_dict, x_column: str, y_column_1: str, y_column_2: str, outfnm: str) :
+def plot_all(df_dict, x_column: str, y_column_1: str, y_column_2: str, outfnm: str) :
     fig, axes = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(10, 5))
 
      # Scatter plot y_column_1 vs x_column in first panel
@@ -25,11 +25,11 @@ def plot(df_dict, x_column: str, y_column_1: str, y_column_2: str, outfnm: str) 
 
     for idx, alias in enumerate (df["alias"].unique()):
         alias_df = df[df["alias"] == alias].sort_values(by=x_column, ascending=True)
-
-        axes[0].plot(alias_df[x_column], alias_df[y_column_1], color=colors[idx])
-        axes[0].scatter(alias_df[x_column], alias_df[y_column_1], color=colors[idx], label=alias)
-        axes[1].plot(alias_df[x_column], alias_df[y_column_2], color=colors[idx])
-        axes[1].scatter(alias_df[x_column], alias_df[y_column_2], color=colors[idx])
+        mod_idx = idx % len(colors)
+        axes[0].plot(alias_df[x_column], alias_df[y_column_1], color=colors[mod_idx])
+        axes[0].scatter(alias_df[x_column], alias_df[y_column_1], color=colors[mod_idx], label=alias)
+        axes[1].plot(alias_df[x_column], alias_df[y_column_2], color=colors[mod_idx])
+        axes[1].scatter(alias_df[x_column], alias_df[y_column_2], color=colors[mod_idx])
 
     axes[0].set_xlabel(x_column)
     axes[0].set_ylabel(y_column_1)
@@ -44,18 +44,67 @@ def plot(df_dict, x_column: str, y_column_1: str, y_column_2: str, outfnm: str) 
     # print(f"plot written to {outfnm}")
     plt.show()
 
+
+import os
+
+
+def plot(df_dict, x_column: str, y_column_1: str, y_column_2: str, scratchdir: str):
+    df = df_dict["patients"]
+    colors = ["yellowgreen", "orange", "red", "cyan", "gold", "purple", "teal"]
+
+    # Iterate through each unique alias
+    for idx, alias_raw in enumerate(df["alias"].unique()):
+        alias = alias_raw.replace(" ", "_")
+
+        # Create figure for this alias
+        fig, axes = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(10, 5))
+
+        # Plot controls in both panels
+        axes[0].scatter(df_dict["controls"][x_column], df_dict["controls"][y_column_1],
+                        label="controls", alpha=0.5)
+        axes[1].scatter(df_dict["controls"][x_column], df_dict["controls"][y_column_2],
+                        label="controls", alpha=0.5)
+
+        # Filter data for current alias
+        alias_df = df[df["alias"] == alias_raw].sort_values(by=x_column, ascending=True)
+        mod_idx = idx % len(colors)
+
+        # Plot this alias's data
+        axes[0].plot(alias_df[x_column], alias_df[y_column_1], color=colors[mod_idx])
+        axes[0].scatter(alias_df[x_column], alias_df[y_column_1],
+                        color=colors[mod_idx], label=alias)
+
+        axes[1].plot(alias_df[x_column], alias_df[y_column_2], color=colors[mod_idx])
+        axes[1].scatter(alias_df[x_column], alias_df[y_column_2],
+                        color=colors[mod_idx], label=alias)
+
+        # Set labels and limits
+        axes[0].set_xlabel(x_column)
+        axes[0].set_ylabel(y_column_1)
+        axes[0].set_ylim([180, 350])
+        axes[0].legend(loc="lower left")
+
+        axes[1].set_xlabel(x_column)
+        axes[1].set_ylabel(y_column_2)
+
+        # Save plot in alias subdirectory
+        outfnm = os.path.join(f"{scratchdir}/png", f"{alias}.png")
+        plt.savefig(outfnm)
+        print(f"Plot for {alias} written to {outfnm}")
+        plt.close(fig)
+
+
 def main():
-    top_level_dir = f"/media/ivana/portable/ush2a/oct/xml"
-    scratch_dir   = "/home/ivana/scratch/ush2a_oct"
+    top_level_dir = f"/media/ivana/portable/abca4/oct/xml"
+    scratch_dir   = "/home/ivana/scratch/abca4_oct"
     output_columns = ['alias', 'eye', 'age_acquired', 'avg_thickness', 'wtd_avg_thickness', 'file_name', 'file_md5']
 
     output_df = {}
     for data_group in ["controls", "patients"]:
         output_df[data_group] = pd.DataFrame(columns=output_columns)
-        oct_df = pd.read_excel(f"{scratch_dir}/interpolated_maps.{data_group}.xlsx")
+        oct_df = pd.read_excel(f"{scratch_dir}/xlsx/interpolated_maps.{data_group}.xlsx")
         data_dir = f"{top_level_dir}/{data_group}"
         for index_value in oct_df.index:
-            print(f"Index: {index_value}")
             ppd = PosteriorPoleData()
             ppd.pd_dataframe_read(oct_df, index_value, fussy=True, xml_dir_path=data_dir)
             ppd.avg_thickness = round(weighted_avg(ppd, interp=True, weight_type="8x8")*1000)
@@ -63,7 +112,12 @@ def main():
             ppd.pd_df_store_minimal(output_df[data_group])
         output_df[data_group].to_excel(f"{scratch_dir}/avg_retinal_thickness.{data_group}.xlsx")
 
-    plot(output_df, "age_acquired", "avg_thickness", "wtd_avg_thickness", f"{scratch_dir}/avg_thckns.png")
+    plot(output_df, "age_acquired", "avg_thickness", "wtd_avg_thickness",
+         f"{scratch_dir}")
+
+    # plot_all(output_df, "age_acquired", "avg_thickness", "wtd_avg_thickness",
+    #      f"{scratch_dir}/avg_thckns.png")
+
 
 #######################
 if __name__ == "__main__":

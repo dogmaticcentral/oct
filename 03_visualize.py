@@ -8,8 +8,8 @@ from oct_utils.plotting import plot_thickness_map
 
 
 def main():
-    top_level_dir = f"/media/ivana/portable/ush2a/oct/xml"
-    scratch_dir   = "/home/ivana/scratch/ush2a_oct"
+    top_level_dir = f"/media/ivana/portable/abca4/oct/xml"
+    scratch_dir   = "/home/ivana/scratch/abca4_oct"
 
     for data_group in ["controls", "patients"]:
         oct_df = pd.read_excel(f"{scratch_dir}/interpolated_maps.{data_group}.xlsx")
@@ -19,7 +19,6 @@ def main():
         os.makedirs(intrp_dir, exist_ok=True)
         data_dir = f"{top_level_dir}/{data_group}"
         for index_value in oct_df.index:
-            print(f"Index: {index_value}")
             ppd = PosteriorPoleData()
             ppd.pd_dataframe_read(oct_df, index_value, fussy=True, xml_dir_path=data_dir)
             plot_thickness_map(ppd, orig_dir, thck_map="original")

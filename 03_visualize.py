@@ -9,7 +9,7 @@ from oct_utils.plotting import plot_thickness_map
 
 def main():
     top_level_dir = f"/media/ivana/portable/abca4/oct/xml"
-    scratch_dir   = "/home/ivana/scratch/abca4_oct"
+    scratch_dir   = "/home/ivana/scratch/abca4_oct/xlsx"
 
     for data_group in ["controls", "patients"]:
         oct_df = pd.read_excel(f"{scratch_dir}/interpolated_maps.{data_group}.xlsx")

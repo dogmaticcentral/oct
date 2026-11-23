@@ -37,11 +37,15 @@ def plot_thickness_map(ppd: PosteriorPoleData, scratch_dir: str, thck_map: str="
     plt.figure()
     plt.title(f"{ppd.alias}, {ppd.age_at_test} {ppd.laterality} ({thck_map})")
     df = ppd.pp_map if thck_map == "original" else ppd.interpolated_map
-    plt.xticks(np.arange(8), np.arange(1, 9))
-    plt.yticks(np.arange(8), np.arange(1, 9))
-    plt.imshow(df, origin="lower", cmap='RdYlBu', interpolation='none', vmin=0.12, vmax=0.38)
-    plt.xlabel("Temporal-Nasal")
-    plt.ylabel("Inferior-Superior")
+    plt.imshow(df, origin="lower", cmap='YlOrRd_r', interpolation='none', vmin=0.12, vmax=0.38)
+    plt.xticks([])
+    plt.yticks([])
+    ax = plt.gca()
+    # orientation labels, aligned with the ends of each axis
+    ax.text(0, -0.02, "Temporal", transform=ax.transAxes, ha="left", va="top")
+    ax.text(1, -0.02, "Nasal", transform=ax.transAxes, ha="right", va="top")
+    ax.text(-0.02, 0, "Inferior", transform=ax.transAxes, ha="right", va="bottom", rotation=90)
+    ax.text(-0.02, 1, "Superior", transform=ax.transAxes, ha="right", va="top", rotation=90)
     plt.colorbar(label="Avg thickness (mm)")  # Show color scale
     outname = thickness_map_outname(ppd, thck_map)
     plt.savefig(f"{scratch_dir}/{outname}")

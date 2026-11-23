@@ -257,7 +257,7 @@ def interpolate(shet_name: str, cell_size_mm, cells_per_side, plot=False):
 def main():
     plot = True
     cell_size_mm   = 0.86
-    cells_per_side = 8
+    cells_per_side = 16
 
     for sheet_name in ["Rods per sq mm", "Cones per sq mm"]:
         interpolate(sheet_name, cell_size_mm=cell_size_mm, cells_per_side=cells_per_side, plot=plot)

@@ -2,6 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FFMpegWriter
 
+from oct_utils.plotting import draw_missing_checkerboard
+
 
 def make_progression_video(ages: list[float], maps: list[np.ndarray], seconds: float, n_points: int, outname: str,
                            hold: float = 0, label: str = "Caucasian Reference"):
@@ -20,6 +22,7 @@ def make_progression_video(ages: list[float], maps: list[np.ndarray], seconds: f
 
     # same look as plot_thickness_map
     fig, ax = plt.subplots()
+    draw_missing_checkerboard(ax, stack.shape[1:])
     img = ax.imshow(stack[0], origin="lower", cmap='YlOrRd_r', interpolation='none', vmin=0.12, vmax=0.38)
     ax.set_xticks([])
     ax.set_yticks([])

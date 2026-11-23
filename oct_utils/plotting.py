@@ -3,9 +3,18 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
+from matplotlib.colors import LinearSegmentedColormap, ListedColormap, TwoSlopeNorm
 
 from oct_utils.data_structures import PosteriorPoleData
+
+
+def draw_missing_checkerboard(ax, shape: tuple[int, int], checks_per_tile: int = 4):
+    """ Fine checkerboard covering the whole map, to be drawn before (i.e. under) the map itself:
+        the colormaps leave missing (NaN) tiles transparent, so the checkerboard shows through only there."""
+    n_rows, n_cols = shape[:2]
+    yy, xx = np.indices((n_rows * checks_per_tile, n_cols * checks_per_tile))
+    ax.imshow((yy + xx) % 2, origin="lower", cmap=ListedColormap(["white", "lightgray"]), interpolation="none",
+              extent=(-0.5, n_cols - 0.5, -0.5, n_rows - 0.5))
 
 
 def _rate_cmap() -> LinearSegmentedColormap:
@@ -14,8 +23,9 @@ def _rate_cmap() -> LinearSegmentedColormap:
     viridis = plt.get_cmap("viridis")
     stops = [(0.0, viridis(1.0)), (0.25, viridis(0.75)), (0.5, "white"), (0.75, viridis(0.3)), (1.0, viridis(0.0))]
     cmap = LinearSegmentedColormap.from_list("viridis_r_white0", stops)
-    # missing tiles would otherwise also show as white, i.e. as "no change"
-    cmap.set_bad("lightgray")
+    # missing tiles are transparent, so the checkerboard underneath shows through
+    # (otherwise they would show as white, i.e. as "no change")
+    cmap.set_bad((0, 0, 0, 0))
     return cmap
 
 
@@ -37,6 +47,7 @@ def plot_thickness_map(ppd: PosteriorPoleData, scratch_dir: str, thck_map: str="
     plt.figure()
     plt.title(f"{ppd.alias}, {ppd.age_at_test} {ppd.laterality} ({thck_map})")
     df = ppd.pp_map if thck_map == "original" else ppd.interpolated_map
+    draw_missing_checkerboard(plt.gca(), np.shape(df))
     plt.imshow(df, origin="lower", cmap='YlOrRd_r', interpolation='none', vmin=0.12, vmax=0.38)
     plt.xticks([])
     plt.yticks([])
@@ -94,6 +105,7 @@ def plot_rate_of_change_map(alias: str, laterality: str, age_from: float, age_to
     plt.title(f"{alias}, {laterality}, {age_from} → {age_to} (rate of change)")
     plt.xticks(np.arange(8), np.arange(1, 9))
     plt.yticks(np.arange(8), np.arange(1, 9))
+    draw_missing_checkerboard(plt.gca(), np.shape(rate_map))
     plt.imshow(rate_map, origin="lower", cmap=_rate_cmap(), interpolation='none', norm=_rate_norm())
     plt.xlabel("Temporal-Nasal")
     plt.ylabel("Inferior-Superior")
@@ -126,6 +138,7 @@ def plot_progression_svg(alias: str, laterality: str, maps: dict[float, pd.DataF
     map_axes = []
     for i, (age, thck_map) in enumerate(maps.items()):
         ax = fig.add_subplot(gs[0, 2 * i: 2 * i + 2])
+        draw_missing_checkerboard(ax, np.shape(thck_map))
         im_map = ax.imshow(thck_map, origin="lower", cmap='RdYlBu', interpolation='none', vmin=0.12, vmax=0.38)
         setup_axes(ax, f"{age}", left=(i == 0))
         map_axes.append(ax)
@@ -135,6 +148,7 @@ def plot_progression_svg(alias: str, laterality: str, maps: dict[float, pd.DataF
         rate_axes = []
         for i, (age_from, age_to, rate_map) in enumerate(rates):
             ax = fig.add_subplot(gs[1, 2 * i + 1: 2 * i + 3])
+            draw_missing_checkerboard(ax, np.shape(rate_map))
             im_rate = ax.imshow(rate_map, origin="lower", cmap=_rate_cmap(), interpolation='none',
                                 norm=_rate_norm())
             setup_axes(ax, f"{age_from} → {age_to}", left=(i == 0))
